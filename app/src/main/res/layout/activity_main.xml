@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <variable
+            name="viewModel"
+            type="com.example.wellnesswrist.MainViewModel" />
+    </data>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="10dp"
+        tools:context=".MainActivity">
+        <TextView
+            android:id="@+id/status_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@{viewModel.status != null ? viewModel.status : `Loading...`}"
+            android:textSize="16sp" />
+        <Button
+            android:id="@+id/fitness_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Fitness" />
+        <Button
+            android:id="@+id/breathing_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Breathing" />
+        <Button
+            android:id="@+id/sunrise_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sunrise" />
+        <Button
+            android:id="@+id/posture_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Posture" />
+        <Button
+            android:id="@+id/caffeine_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Caffeine" />
+        <Button
+            android:id="@+id/noise_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Noise" />
+    </LinearLayout>
+</layout>
