@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <variable
+            name="viewModel"
+            type="com.example.wellnesswrist.ExerciseViewModel" />
+    </data>
+    <androidx.wear.widget.BoxInsetLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="8dp"
+        tools:context=".ExerciseInputActivity">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{viewModel.exerciseType}"
+                android:textSize="14sp"
+                android:layout_marginBottom="8dp" />
+            <EditText
+                android:id="@+id/height_input"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:hint="Height (cm)"
+                android:inputType="numberDecimal"
+                android:textSize="12sp"
+                android:layout_marginBottom="8dp" />
+            <EditText
+                android:id="@+id/weight_input"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:hint="Weight (lbs)"
+                android:inputType="numberDecimal"
+                android:textSize="12sp"
+                android:layout_marginBottom="8dp" />
+            <Button
+                android:id="@+id/start_exercise_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                android:text="Start" />
+        </LinearLayout>
+    </androidx.wear.widget.BoxInsetLayout>
+</layout>
