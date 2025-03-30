@@ -2,8 +2,11 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
     <androidx.wear.widget.WearableRecyclerView
+        android:id="@+id/menuRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/menu_recycler_view"
+        android:paddingStart="24dp"
+        android:paddingEnd="24dp"
+        android:clipToPadding="false"
         tools:context=".MenuActivity" />
 </layout>

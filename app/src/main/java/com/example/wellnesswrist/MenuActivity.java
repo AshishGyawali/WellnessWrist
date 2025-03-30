@@ -2,15 +2,20 @@ package com.example.wellnesswrist;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+
 import androidx.activity.ComponentActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.wear.widget.WearableLinearLayoutManager;
 import androidx.wear.widget.WearableRecyclerView;
 import com.example.wellnesswrist.databinding.ActivityMenuBinding;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 public class MenuActivity extends ComponentActivity {
     private ActivityMenuBinding binding;
+    private MenuAdapter adapter;
+    private int centerPosition = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -18,78 +23,120 @@ public class MenuActivity extends ComponentActivity {
         binding = ActivityMenuBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        // Initialize menu items
+        List<MenuItem> menuItems = new ArrayList<>();
+        menuItems.add(new MenuItem("Exercise", R.drawable.ic_exercise));
+        menuItems.add(new MenuItem("Caffeine", R.drawable.ic_caffeine));
+        menuItems.add(new MenuItem("Breathing", R.drawable.ic_breathing));
+        menuItems.add(new MenuItem("Settings", R.drawable.ic_settings));
+
+        // Set up the WearableRecyclerView
         WearableRecyclerView recyclerView = binding.menuRecyclerView;
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setLayoutManager(new WearableLinearLayoutManager(this, new CustomLayoutCallback()));
+        recyclerView.setCircularScrollingGestureEnabled(true);
+        recyclerView.setBezelFraction(0.5f);
+        recyclerView.setScrollDegreesPerScreen(90);
         recyclerView.setEdgeItemsCenteringEnabled(true);
 
-        List<MenuItem> menuItems = Arrays.asList(
-                new MenuItem("Exercise", R.drawable.ic_exercise, ExerciseListActivity.class),
-                new MenuItem("Caffeine", R.drawable.ic_caffeine, CaffeineInputActivity.class),
-                new MenuItem("Breathing", R.drawable.ic_breathing, BreathingActivity.class),
-                new MenuItem("Settings", R.drawable.ic_settings, SettingsActivity.class)
-        );
+        // Apply fading, scaling, and highlight effect
+        recyclerView.addOnScrollListener(new WearableRecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                updateChildViews(recyclerView);
+            }
 
-        MenuAdapter adapter = new MenuAdapter(menuItems, this::startActivity);
-        recyclerView.setAdapter(adapter);
-    }
-}
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+                if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                    updateChildViews(recyclerView);
+                }
+            }
 
-class MenuItem {
-    String name;
-    int iconResId;
-    Class<?> targetActivity;
+            private void updateChildViews(RecyclerView recyclerView) {
+                int centerY = recyclerView.getHeight() / 2;
+                int closestPosition = -1;
+                float minDistance = Float.MAX_VALUE;
 
-    MenuItem(String name, int iconResId, Class<?> targetActivity) {
-        this.name = name;
-        this.iconResId = iconResId;
-        this.targetActivity = targetActivity;
-    }
-}
+                // Find the item closest to the center
+                for (int i = 0; i < recyclerView.getChildCount(); i++) {
+                    View child = recyclerView.getChildAt(i);
+                    int childCenterY = (child.getTop() + child.getBottom()) / 2;
+                    float distanceFromCenter = Math.abs(centerY - childCenterY);
 
-class MenuAdapter extends WearableRecyclerView.Adapter<MenuAdapter.ViewHolder> {
-    private final List<MenuItem> menuItems;
-    private final IntentStarter intentStarter;
+                    if (distanceFromCenter < minDistance) {
+                        minDistance = distanceFromCenter;
+                        closestPosition = recyclerView.getChildAdapterPosition(child);
+                    }
 
-    interface IntentStarter {
-        void startActivity(Intent intent);
-    }
+                    float maxDistance = recyclerView.getHeight() / 2f;
+                    // Apply fading effect
+                    float alpha = 1f - (distanceFromCenter / maxDistance);
+                    alpha = Math.max(0.3f, alpha);
+                    child.setAlpha(alpha);
 
-    MenuAdapter(List<MenuItem> menuItems, IntentStarter intentStarter) {
-        this.menuItems = menuItems;
-        this.intentStarter = intentStarter;
-    }
+                    // Apply scaling effect
+                    float scale = 1f - (distanceFromCenter / maxDistance) * 0.5f;
+                    scale = Math.max(0.5f, scale);
+                    child.setScaleX(scale);
+                    child.setScaleY(scale);
+                }
 
-    @Override
-    public ViewHolder onCreateViewHolder(android.view.ViewGroup parent, int viewType) {
-        android.view.View view = android.view.LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.menu_item, parent, false);
-        return new ViewHolder(view);
-    }
-
-    @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
-        MenuItem item = menuItems.get(position);
-        holder.textView.setText(item.name);
-        holder.imageView.setImageResource(item.iconResId);
-        holder.itemView.setOnClickListener(v -> {
-            Intent intent = new Intent(holder.itemView.getContext(), item.targetActivity);
-            intentStarter.startActivity(intent);
+                // Update the highlighted position
+                if (closestPosition != centerPosition) {
+                    centerPosition = closestPosition;
+                    adapter.setHighlightedPosition(centerPosition);
+                    adapter.notifyDataSetChanged();
+                }
+            }
         });
+
+        // Set up the adapter
+        adapter = new MenuAdapter(this, menuItems, position -> {
+            // Only allow clicks on the center item
+            if (position == centerPosition) {
+                switch (position) {
+                    case 0: // Exercise
+                        startActivity(new Intent(MenuActivity.this, ExerciseListActivity.class));
+                        break;
+                    case 1: // Caffeine
+                        startActivity(new Intent(MenuActivity.this, CaffeineInputActivity.class));
+                        break;
+                    case 2: // Breathing
+                        startActivity(new Intent(MenuActivity.this, BreathingActivity.class));
+                        break;
+                    case 3: // Settings
+                        startActivity(new Intent(MenuActivity.this, SettingsActivity.class));
+                        break;
+                }
+            }
+        });
+        recyclerView.setAdapter(adapter);
+
+        // Scroll to the middle item by default
+        recyclerView.scrollToPosition(menuItems.size() / 2);
     }
 
-    @Override
-    public int getItemCount() {
-        return menuItems.size();
-    }
+    // Custom LayoutCallback to create a curved effect
+    private static class CustomLayoutCallback extends WearableLinearLayoutManager.LayoutCallback {
+        private static final float MAX_CHILD_SCALE = 1.0f;
+        private static final float MIN_CHILD_SCALE = 0.65f;
 
-    static class ViewHolder extends WearableRecyclerView.ViewHolder {
-        android.widget.TextView textView;
-        android.widget.ImageView imageView;
+        @Override
+        public void onLayoutFinished(View child, RecyclerView parent) {
+            // Calculate the center of the child view
+            float centerOffset = ((child.getHeight() / 2f) - parent.getHeight() / 2f) / parent.getHeight();
+            float yRelativeToCenter = (child.getY() - parent.getHeight() / 2f) / parent.getHeight();
 
-        ViewHolder(android.view.View itemView) {
-            super(itemView);
-            textView = itemView.findViewById(R.id.menu_text);
-            imageView = itemView.findViewById(R.id.menu_icon);
+            // Apply scaling based on the distance from the center
+            float scale = MAX_CHILD_SCALE - (MAX_CHILD_SCALE - MIN_CHILD_SCALE) * Math.abs(yRelativeToCenter);
+            child.setScaleX(scale);
+            child.setScaleY(scale);
+
+            // Apply a slight curve effect by adjusting the X position (further reduced to prevent clipping)
+            float xOffset = (float) Math.sin(centerOffset * Math.PI) * 20f; // Reduced from 30f to 20f
+            child.setTranslationX(xOffset);
         }
     }
 }
