@@ -1,3 +1,20 @@
 <resources>
     <string name="app_name">WellnessWrist</string>
+    <string-array name="coffee_types">
+        <item>Espresso</item>
+        <item>Americano</item>
+        <item>Latte</item>
+        <item>Cappuccino</item>
+        <item>Black Coffee</item>
+    </string-array>
+    <string-array name="coffee_sizes_standard">
+        <item>S</item>
+        <item>M</item>
+        <item>L</item>
+        <item>XL</item>
+    </string-array>
+    <string-array name="coffee_sizes_espresso">
+        <item>Single</item>
+        <item>Double</item>
+    </string-array>
 </resources>

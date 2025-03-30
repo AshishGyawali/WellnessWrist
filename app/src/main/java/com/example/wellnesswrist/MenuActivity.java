@@ -3,7 +3,6 @@ package com.example.wellnesswrist;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-
 import androidx.activity.ComponentActivity;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.wear.widget.WearableLinearLayoutManager;
@@ -59,7 +58,6 @@ public class MenuActivity extends ComponentActivity {
                 int closestPosition = -1;
                 float minDistance = Float.MAX_VALUE;
 
-                // Find the item closest to the center
                 for (int i = 0; i < recyclerView.getChildCount(); i++) {
                     View child = recyclerView.getChildAt(i);
                     int childCenterY = (child.getTop() + child.getBottom()) / 2;
@@ -71,19 +69,16 @@ public class MenuActivity extends ComponentActivity {
                     }
 
                     float maxDistance = recyclerView.getHeight() / 2f;
-                    // Apply fading effect
                     float alpha = 1f - (distanceFromCenter / maxDistance);
                     alpha = Math.max(0.3f, alpha);
                     child.setAlpha(alpha);
 
-                    // Apply scaling effect
                     float scale = 1f - (distanceFromCenter / maxDistance) * 0.5f;
                     scale = Math.max(0.5f, scale);
                     child.setScaleX(scale);
                     child.setScaleY(scale);
                 }
 
-                // Update the highlighted position
                 if (closestPosition != centerPosition) {
                     centerPosition = closestPosition;
                     adapter.setHighlightedPosition(centerPosition);
@@ -101,7 +96,7 @@ public class MenuActivity extends ComponentActivity {
                         startActivity(new Intent(MenuActivity.this, ExerciseListActivity.class));
                         break;
                     case 1: // Caffeine
-                        startActivity(new Intent(MenuActivity.this, CaffeineInputActivity.class));
+                        startActivity(new Intent(MenuActivity.this, CaffeineMenuActivity.class));
                         break;
                     case 2: // Breathing
                         startActivity(new Intent(MenuActivity.this, BreathingActivity.class));
@@ -125,17 +120,14 @@ public class MenuActivity extends ComponentActivity {
 
         @Override
         public void onLayoutFinished(View child, RecyclerView parent) {
-            // Calculate the center of the child view
             float centerOffset = ((child.getHeight() / 2f) - parent.getHeight() / 2f) / parent.getHeight();
             float yRelativeToCenter = (child.getY() - parent.getHeight() / 2f) / parent.getHeight();
 
-            // Apply scaling based on the distance from the center
             float scale = MAX_CHILD_SCALE - (MAX_CHILD_SCALE - MIN_CHILD_SCALE) * Math.abs(yRelativeToCenter);
             child.setScaleX(scale);
             child.setScaleY(scale);
 
-            // Apply a slight curve effect by adjusting the X position (further reduced to prevent clipping)
-            float xOffset = (float) Math.sin(centerOffset * Math.PI) * 20f; // Reduced from 30f to 20f
+            float xOffset = (float) Math.sin(centerOffset * Math.PI) * 20f;
             child.setTranslationX(xOffset);
         }
     }

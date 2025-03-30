@@ -29,6 +29,12 @@
             android:name=".CaffeineInputActivity"
             android:exported="false" />
         <activity
+            android:name=".CaffeineSummaryActivity"
+            android:exported="false" />
+        <activity
+            android:name=".CaffeineMenuActivity"
+            android:exported="false" />
+        <activity
             android:name=".ExerciseInputActivity"
             android:exported="false" />
         <activity

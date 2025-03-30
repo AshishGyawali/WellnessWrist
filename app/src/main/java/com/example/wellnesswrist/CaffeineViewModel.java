@@ -1,49 +1,61 @@
 package com.example.wellnesswrist;
 
-import android.os.Handler;
-import android.os.Looper;
-import android.view.View;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 public class CaffeineViewModel extends ViewModel {
-    public MutableLiveData<String> caffeineText = new MutableLiveData<>();
-    public MutableLiveData<Float> currentCaffeine = new MutableLiveData<>(0f);
-    public MutableLiveData<Boolean> showCaffeine = new MutableLiveData<>(false);
+    public MutableLiveData<String> coffeeType = new MutableLiveData<>();
+    public MutableLiveData<String> coffeeSize = new MutableLiveData<>();
+    public MutableLiveData<Float> caffeineContent = new MutableLiveData<>(0f);
 
-    private float totalCaffeine = 0;
-    private final Handler handler = new Handler(Looper.getMainLooper());
+    public void calculateCaffeine() {
+        String type = coffeeType.getValue();
+        String size = coffeeSize.getValue();
+        if (type == null || size == null) return;
 
-    private final Runnable decayRunnable = new Runnable() {
-        @Override
-        public void run() {
-            totalCaffeine /= 2;
-            currentCaffeine.setValue(totalCaffeine);
-            caffeineText.setValue("Caffeine: " + totalCaffeine + " mg");
-            if (totalCaffeine > 0) {
-                handler.postDelayed(this, 18000000); // 5 hours
-            }
-        }
-    };
+        float baseCaffeine = 0f;
+        float sizeMultiplier = 1f;
 
-    public void calculateCaffeine(String coffeeType, float sizeOz) {
-        float caffeinePerOz = 0;
-        switch (coffeeType) {
+        // Determine base caffeine content based on coffee type
+        switch (type) {
             case "Espresso":
-                caffeinePerOz = 30; // 30 mg per oz
+                baseCaffeine = 63f; // Base caffeine for a single shot
+                if ("Double".equals(size)) {
+                    sizeMultiplier = 2f; // Double shot
+                }
+                break;
+            case "Americano":
+                baseCaffeine = 95f; // Base caffeine for a small Americano
+                break;
+            case "Latte":
+                baseCaffeine = 95f; // Base caffeine for a small Latte
                 break;
             case "Cappuccino":
-                caffeinePerOz = 10; // 10 mg per oz
+                baseCaffeine = 95f; // Base caffeine for a small Cappuccino
+                break;
+            case "Black Coffee":
+                baseCaffeine = 95f; // Base caffeine for a small Black Coffee
                 break;
         }
-        totalCaffeine += caffeinePerOz * sizeOz;
-        currentCaffeine.setValue(totalCaffeine);
-        if (totalCaffeine > 400) {
-            caffeineText.setValue("Caffeine Limit Reached! (" + totalCaffeine + " mg)");
-        } else {
-            caffeineText.setValue("Caffeine: " + totalCaffeine + " mg");
+
+        // Adjust caffeine content based on size (for non-Espresso types)
+        if (!"Espresso".equals(type)) {
+            switch (size) {
+                case "S":
+                    sizeMultiplier = 1f;
+                    break;
+                case "M":
+                    sizeMultiplier = 1.5f;
+                    break;
+                case "L":
+                    sizeMultiplier = 2f;
+                    break;
+                case "XL":
+                    sizeMultiplier = 2.5f;
+                    break;
+            }
         }
-        showCaffeine.setValue(true);
-        handler.postDelayed(decayRunnable, 18000000); // Start decay after 5 hours
+
+        caffeineContent.setValue(baseCaffeine * sizeMultiplier);
     }
 }

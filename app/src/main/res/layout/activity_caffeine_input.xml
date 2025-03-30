@@ -5,46 +5,40 @@
         <variable
             name="viewModel"
             type="com.example.wellnesswrist.CaffeineViewModel" />
-        <import type="android.view.View" />
     </data>
-    <LinearLayout
+    <androidx.wear.widget.BoxInsetLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:gravity="center"
-        android:padding="10dp"
+        android:padding="8dp"
         tools:context=".CaffeineInputActivity">
-        <Spinner
-            android:id="@+id/coffee_type_spinner"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp" />
-        <EditText
-            android:id="@+id/size_input"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:hint="Size (oz)"
-            android:inputType="numberDecimal"
-            android:layout_marginBottom="10dp" />
-        <Button
-            android:id="@+id/calculate_caffeine_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Calculate" />
-        <TextView
-            android:id="@+id/caffeine_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@{viewModel.caffeineText}"
-            android:textSize="14sp"
-            android:visibility="@{viewModel.showCaffeine ? View.VISIBLE : View.GONE}" />
-        <ProgressBar
-            android:id="@+id/caffeine_gauge"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            style="?android:attr/progressBarStyleHorizontal"
-            android:max="400"
-            android:progress="@{viewModel.currentCaffeine.intValue()}"
-            android:visibility="@{viewModel.showCaffeine ? View.VISIBLE : View.GONE}" />
-    </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Caffeine Intake"
+                android:textSize="14sp"
+                android:layout_marginBottom="8dp" />
+            <Spinner
+                android:id="@+id/coffee_type_spinner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:entries="@array/coffee_types"
+                android:layout_marginBottom="8dp" />
+            <Spinner
+                android:id="@+id/coffee_size_spinner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp" />
+            <Button
+                android:id="@+id/log_caffeine_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Log Caffeine"
+                android:textSize="12sp" />
+        </LinearLayout>
+    </androidx.wear.widget.BoxInsetLayout>
 </layout>
