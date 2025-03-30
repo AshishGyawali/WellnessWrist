@@ -17,7 +17,7 @@
             android:id="@+id/breathing_circle"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:background="@android:color/holo_blue_light"
+            android:background="@drawable/circle_background"
             android:scaleX="@{viewModel.scale}"
             android:scaleY="@{viewModel.scale}" />
         <TextView
@@ -26,6 +26,14 @@
             android:layout_height="wrap_content"
             android:text="@{viewModel.breathingText}"
             android:textSize="16sp"
-            android:layout_marginTop="10dp" />
+            android:layout_marginTop="25dp" />
+        <Button
+            android:id="@+id/stop_exercise_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Stop Exercise"
+            android:textSize="12sp"
+            android:layout_marginTop="10dp"
+            android:visibility="visible" />
     </LinearLayout>
 </layout>

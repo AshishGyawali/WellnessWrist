@@ -1,5 +1,6 @@
 package com.example.wellnesswrist;
 
+import android.content.Intent;
 import android.os.Bundle;
 import androidx.activity.ComponentActivity;
 import androidx.databinding.DataBindingUtil;
@@ -17,6 +18,15 @@ public class BreathingActivity extends ComponentActivity {
         binding.setViewModel(viewModel);
         binding.setLifecycleOwner(this);
 
+        // Set up stop button to navigate back to BreathingMenuActivity
+        binding.stopExerciseButton.setOnClickListener(v -> {
+            viewModel.stopBreathing();
+            Intent intent = new Intent(this, BreathingMenuActivity.class);
+            startActivity(intent);
+            finish(); // Close this activity
+        });
+
+        // Start breathing when activity is launched (triggered by BreathingMenuActivity)
         viewModel.startBreathing();
     }
 }

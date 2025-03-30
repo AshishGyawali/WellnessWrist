@@ -22,14 +22,12 @@ public class MenuActivity extends ComponentActivity {
         binding = ActivityMenuBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        // Initialize menu items
         List<MenuItem> menuItems = new ArrayList<>();
         menuItems.add(new MenuItem("Exercise", R.drawable.ic_exercise));
         menuItems.add(new MenuItem("Caffeine", R.drawable.ic_caffeine));
         menuItems.add(new MenuItem("Breathing", R.drawable.ic_breathing));
         menuItems.add(new MenuItem("Settings", R.drawable.ic_settings));
 
-        // Set up the WearableRecyclerView
         WearableRecyclerView recyclerView = binding.menuRecyclerView;
         recyclerView.setLayoutManager(new WearableLinearLayoutManager(this, new CustomLayoutCallback()));
         recyclerView.setCircularScrollingGestureEnabled(true);
@@ -37,7 +35,6 @@ public class MenuActivity extends ComponentActivity {
         recyclerView.setScrollDegreesPerScreen(90);
         recyclerView.setEdgeItemsCenteringEnabled(true);
 
-        // Apply fading, scaling, and highlight effect
         recyclerView.addOnScrollListener(new WearableRecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -87,9 +84,7 @@ public class MenuActivity extends ComponentActivity {
             }
         });
 
-        // Set up the adapter
         adapter = new MenuAdapter(this, menuItems, position -> {
-            // Only allow clicks on the center item
             if (position == centerPosition) {
                 switch (position) {
                     case 0: // Exercise
@@ -99,7 +94,7 @@ public class MenuActivity extends ComponentActivity {
                         startActivity(new Intent(MenuActivity.this, CaffeineMenuActivity.class));
                         break;
                     case 2: // Breathing
-                        startActivity(new Intent(MenuActivity.this, BreathingActivity.class));
+                        startActivity(new Intent(MenuActivity.this, BreathingMenuActivity.class));
                         break;
                     case 3: // Settings
                         startActivity(new Intent(MenuActivity.this, SettingsActivity.class));
@@ -109,11 +104,9 @@ public class MenuActivity extends ComponentActivity {
         });
         recyclerView.setAdapter(adapter);
 
-        // Scroll to the middle item by default
         recyclerView.scrollToPosition(menuItems.size() / 2);
     }
 
-    // Custom LayoutCallback to create a curved effect
     private static class CustomLayoutCallback extends WearableLinearLayoutManager.LayoutCallback {
         private static final float MAX_CHILD_SCALE = 1.0f;
         private static final float MIN_CHILD_SCALE = 0.65f;
