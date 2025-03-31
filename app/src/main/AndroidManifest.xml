@@ -5,6 +5,7 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-feature android:name="android.hardware.type.watch" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -14,6 +15,10 @@
         <meta-data
             android:name="com.google.android.wearable.standalone"
             android:value="true" />
+        <service
+            android:name=".WellnessService"
+            android:exported="false"
+            android:foregroundServiceType="microphone|location|health" />
         <activity
             android:name=".ExerciseTimerActivity"
             android:exported="false" />
