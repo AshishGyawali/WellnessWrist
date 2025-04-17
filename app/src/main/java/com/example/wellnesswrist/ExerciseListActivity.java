@@ -1,16 +1,25 @@
 package com.example.wellnesswrist;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+
 import androidx.activity.ComponentActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.wear.widget.WearableLinearLayoutManager;
 import androidx.wear.widget.WearableRecyclerView;
 import com.example.wellnesswrist.databinding.ActivityExerciseListBinding;
+import androidx.recyclerview.widget.LinearSnapHelper;
+import androidx.recyclerview.widget.RecyclerView;
 import java.util.Arrays;
 import java.util.List;
 
 public class ExerciseListActivity extends ComponentActivity {
     private ActivityExerciseListBinding binding;
+    private ExerciseAdapter adapter;
+    private List<ExerciseItem> exercises;
+    private WearableLinearLayoutManager layoutManager;
+    private int highlightedPosition = 2; // Default to "Walking" (middle item, position 2)
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -19,21 +28,60 @@ public class ExerciseListActivity extends ComponentActivity {
         setContentView(binding.getRoot());
 
         WearableRecyclerView recyclerView = binding.exerciseRecyclerView;
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        // for linear layout
+        layoutManager = new WearableLinearLayoutManager(this, new WearableLinearLayoutManager.LayoutCallback() {
+            @Override
+            public void onLayoutFinished(View child, RecyclerView parent) {
+                // ✅ Flatten visual scaling
+                child.setScaleX(1f);
+                child.setScaleY(1f);
+            }
+        });
+
+        recyclerView.setLayoutManager(layoutManager);
         recyclerView.setEdgeItemsCenteringEnabled(true);
 
-        List<ExerciseItem> exercises = Arrays.asList(
-                new ExerciseItem("Resting", R.drawable.ic_resting),
-                new ExerciseItem("After Exercise", R.drawable.ic_after_exercise)
+// Optional: also disable gesture-based circular scroll
+        recyclerView.setCircularScrollingGestureEnabled(false);
+        recyclerView.setScrollDegreesPerScreen(0);
+
+
+        // Snap to center
+        LinearSnapHelper snapHelper = new LinearSnapHelper();
+        snapHelper.attachToRecyclerView(recyclerView);
+
+        exercises = Arrays.asList(
+                new ExerciseItem("Running", R.drawable.ic_running),
+                new ExerciseItem("Cycling", R.drawable.ic_cycling),
+                new ExerciseItem("Walking", R.drawable.ic_walking),
+                new ExerciseItem("Swimming", R.drawable.ic_swimming),
+                new ExerciseItem("Badminton", R.drawable.ic_badminton)
         );
 
-        ExerciseAdapter adapter = new ExerciseAdapter(exercises, exercise -> {
+        adapter = new ExerciseAdapter(this, exercises, position -> {
             Intent intent = new Intent(this, ExerciseInputActivity.class);
-            intent.putExtra("exercise_type", exercise);
+            intent.putExtra("exercise_type", exercises.get(position).getName());
             startActivity(intent);
         });
+
+        adapter.setHighlightedPosition(highlightedPosition);
         recyclerView.setAdapter(adapter);
+        recyclerView.scrollToPosition(highlightedPosition);
+
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                int centerPosition = layoutManager.findLastCompletelyVisibleItemPosition();
+                if (centerPosition != RecyclerView.NO_POSITION && centerPosition != highlightedPosition) {
+                    highlightedPosition = centerPosition;
+                    adapter.setHighlightedPosition(highlightedPosition);
+                    adapter.notifyDataSetChanged();
+                }
+            }
+        });
     }
+
 }
 
 class ExerciseItem {
@@ -44,19 +92,34 @@ class ExerciseItem {
         this.name = name;
         this.iconResId = iconResId;
     }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getIconResId() {
+        return iconResId;
+    }
 }
 
 class ExerciseAdapter extends WearableRecyclerView.Adapter<ExerciseAdapter.ViewHolder> {
     private final List<ExerciseItem> exercises;
-    private final ExerciseClickListener listener;
+    private final Context context;
+    private final OnItemClickListener listener;
+    private int highlightedPosition = -1;
 
-    interface ExerciseClickListener {
-        void onExerciseClick(String exercise);
+    interface OnItemClickListener {
+        void onItemClick(int position);
     }
 
-    ExerciseAdapter(List<ExerciseItem> exercises, ExerciseClickListener listener) {
+    ExerciseAdapter(Context context, List<ExerciseItem> exercises, OnItemClickListener listener) {
+        this.context = context;
         this.exercises = exercises;
         this.listener = listener;
+    }
+
+    public void setHighlightedPosition(int position) {
+        this.highlightedPosition = position;
     }
 
     @Override
@@ -69,9 +132,25 @@ class ExerciseAdapter extends WearableRecyclerView.Adapter<ExerciseAdapter.ViewH
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         ExerciseItem item = exercises.get(position);
-        holder.textView.setText(item.name);
-        holder.imageView.setImageResource(item.iconResId);
-        holder.itemView.setOnClickListener(v -> listener.onExerciseClick(item.name));
+        holder.textView.setText(item.getName());
+        holder.imageView.setImageResource(item.getIconResId());
+
+        // Highlight the center item
+        holder.itemView.setSelected(position == highlightedPosition);
+
+        // Increase text size for the selected item
+        if (position == highlightedPosition) {
+            holder.textView.setTextSize(16); // Larger text size for selected item
+        } else {
+            holder.textView.setTextSize(14); // Default text size for unselected items
+        }
+
+        // Restrict clicks to the center item
+        holder.itemView.setOnClickListener(v -> {
+            if (position == highlightedPosition) {
+                listener.onItemClick(position);
+            }
+        });
     }
 
     @Override

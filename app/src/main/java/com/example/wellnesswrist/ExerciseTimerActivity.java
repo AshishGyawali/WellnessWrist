@@ -25,7 +25,7 @@ public class ExerciseTimerActivity extends ComponentActivity {
 
         // Set exercise type and start the timer
         viewModel.exerciseType.setValue(exerciseType);
-        viewModel.startTimer(height, weight);
+        viewModel.startTimer(this, height, weight);
 
         binding.pauseButton.setOnClickListener(v -> {
             if (viewModel.isPaused.getValue() != null && viewModel.isPaused.getValue()) {
@@ -37,11 +37,9 @@ public class ExerciseTimerActivity extends ComponentActivity {
 
         binding.stopButton.setOnClickListener(v -> {
             viewModel.stopTimer();
-            // Do not finish the activity here; let the user view the results
         });
 
         binding.backToExerciseListButton.setOnClickListener(v -> {
-            // Navigate back to ExerciseListActivity
             Intent intent = new Intent(ExerciseTimerActivity.this, ExerciseListActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
             startActivity(intent);

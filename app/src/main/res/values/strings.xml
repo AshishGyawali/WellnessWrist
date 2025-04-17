@@ -17,4 +17,5 @@
         <item>Single</item>
         <item>Double</item>
     </string-array>
+    <string name="exercise_icon_description">Exercise icon</string>
 </resources>

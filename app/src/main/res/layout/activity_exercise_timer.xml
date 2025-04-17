@@ -31,6 +31,14 @@
                 android:textSize="20sp"
                 android:layout_marginBottom="8dp"
                 android:visibility="@{viewModel.isTimerRunning ? View.VISIBLE : View.GONE}" />
+            <TextView
+                android:id="@+id/intensity_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{viewModel.intensityText}"
+                android:textSize="12sp"
+                android:layout_marginBottom="8dp"
+                android:visibility="@{viewModel.isTimerRunning ? View.VISIBLE : View.GONE}" />
             <Button
                 android:id="@+id/pause_button"
                 android:layout_width="wrap_content"
